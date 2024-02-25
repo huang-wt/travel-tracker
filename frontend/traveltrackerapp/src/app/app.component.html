@@ -6,7 +6,7 @@
   <div class="collapse navbar-collapse" id="navbarColor02">
      <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
-           <a class="nav-link">Add City <span class="sr-only">(current)</span></a>
+           <a class="nav-link" (click)="onOpenModal(null, 'add')">Add City <span class="sr-only">(current)</span></a>
         </li>
      </ul>
      <form class="form-inline my-2 my-lg-0">
@@ -14,9 +14,9 @@
      </form>
   </div>
 </nav>
-<div class="container">
+<div class="container" id="main-container">
 <div class="row">
-  <div *ngFor="let city of cities" class="col-md-6 col-xl-3">
+  <div *ngFor="let city of cities" class="col-md-6 col-xl-4">
      <div class="card m-b-30">
         <div class="card-body row">
            <div class="col-6">
@@ -34,12 +34,127 @@
         </ul>
         <div class="card-body">
            <div class="float-right btn-group btn-group-sm">
-              <a class="btn btn-primary tooltips" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil"></i> </a>
-              <a class="btn btn-secondary tooltips" data-placement="top" data-original-title="Delete"><i class="fa fa-times"></i></a>
+              <a (click)="onOpenModal(city, 'edit')" class="btn btn-primary tooltips" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil"></i> </a>
+              <a (click)="onOpenModal(city, 'delete')" class="btn btn-secondary tooltips" data-placement="top" data-original-title="Delete"><i class="fa fa-times"></i></a>
            </div>
         </div>
      </div>
   </div>
+</div>
+
+<!-- Add City Modal -->
+<div class="modal fade" id="addCityModal" tabindex="-1" role="dialog" aria-labelledby="addCityModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+       <div class="modal-header">
+          <h5 class="modal-title" id="addCityModalLabel">Add City</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+       </div>
+       <div class="modal-body">
+          <form #addForm="ngForm" (ngSubmit)="onAddCity(addForm)">
+          <div class="form-group">
+             <label for="name">Name</label>
+             <input type="text" ngModel name="name" class="form-control" id="name" placeholder="Name" required>
+          </div>
+          <div class="form-group">
+             <label for="country">Country</label>
+             <input type="text" ngModel name="country" class="form-control" id="country" placeholder="Country" required>
+          </div>
+          <div class="form-group">
+             <label for="visitedYear">Visited Year</label>
+             <input type="text" ngModel name="visitedYear" class="form-control" id="visitedYear" placeholder="Visted Year" required>
+          </div>
+          <div class="form-group">
+             <label for="rating">Rating</label>
+             <input type="text" ngModel name="rating" class="form-control" id="rating" placeholder="Rating" required>
+          </div>
+          <div class="form-group">
+            <label for="review">Review</label>
+            <input type="text" ngModel name="review" class="form-control" id="review" placeholder="Review" required>
+         </div>
+          <div class="form-group">
+             <label for="imageUrl">Image URL</label>
+             <input type="text" ngModel name="imageUrl" class="form-control" id="imageUrl" placeholder="Image URL" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="add-city-form" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button [disabled]="addForm.invalid" type="submit" class="btn btn-primary" >Save changes</button>
+         </div>
+         </form>
+      </div>
+   </div>
+ </div>
+ </div>
+
+ <!-- Edit Modal -->
+<div class="modal fade" id="updateCityModal" tabindex="-1" role="dialog" aria-labelledby="cityEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+     <div class="modal-content">
+        <div class="modal-header">
+           <h5 class="modal-title" id="updateCityModalLabel">Edit City {{editCity?.name}}</h5>
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+           </button>
+        </div>
+        <div class="modal-body">
+           <form #editForm="ngForm">
+              <div class="form-group">
+                 <label for="name">Name</label>
+                 <input type="text" ngModel="{{editCity?.name}}" name="name" class="form-control" id="name" placeholder="Name">
+              </div>
+              <input type="hidden" ngModel="{{editCity?.id}}" name="id" class="form-control" id="id" placeholder="id">
+              <div class="form-group">
+                 <label for="country">Country</label>
+                 <input type="text" ngModel="{{editCity?.country}}" name="country" class="form-control" id="country" placeholder="Country">
+              </div>
+              <div class="form-group">
+                 <label for="visitedYear">Visited Year</label>
+                 <input type="text" ngModel="{{editCity?.visitedYear}}" name="visitedYear" class="form-control" id="visitedYear" placeholder="Visited Year">
+              </div>
+              <div class="form-group">
+                 <label for="rating">Rating</label>
+                 <input type="text" ngModel="{{editCity?.rating}}" name="rating" class="form-control" id="rating" placeholder="Rating">
+              </div>
+              <div class="form-group">
+                <label for="review">Review</label>
+                <input type="text" ngModel="{{editCity?.review}}" name="review" class="form-control" id="review" placeholder="Review">
+             </div>
+              <div class="form-group">
+                 <label for="imageUrl">Image URL</label>
+                 <input type="text" ngModel="{{editCity?.imageUrl}}" name="imageUrl" class="form-control" id="imageUrl" placeholder="Image URL">
+              </div>
+              <div class="modal-footer">
+                <button type="button" id="" data-dismiss="modal" class="btn btn-secondary">Close</button>
+                <button (click)="onUpdateCity(editForm.value)" data-dismiss="modal" class="btn btn-primary" >Save changes</button>
+             </div>
+          </form>
+       </div>
+    </div>
+ </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteCityModal" tabindex="-1" role="dialog" aria-labelledby="deleteModelLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+     <div class="modal-content">
+        <div class="modal-header">
+           <h5 class="modal-title" id="deleteModelLabel">Delete City</h5>
+           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+           </button>
+        </div>
+        <div class="modal-body">
+           <p>Are you sure you want to delete city {{deleteCity?.name}}?</p>
+           <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+              <button (click)="onDeleteCity(deleteCity!.id)" class="btn btn-danger" data-dismiss="modal">Yes</button>
+           </div>
+        </div>
+     </div>
+  </div>
+</div>
 </div>
 
 <!-- Notification for no cities -->
