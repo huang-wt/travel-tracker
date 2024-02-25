@@ -16,21 +16,21 @@
 </nav>
 <div class="container">
 <div class="row">
-  <div class="col-md-6 col-xl-3">
+  <div *ngFor="let city of cities" class="col-md-6 col-xl-3">
      <div class="card m-b-30">
         <div class="card-body row">
            <div class="col-6">
-              <a href=""><img src="" alt="" class="img-fluid rounded-circle w-100"></a>
+              <a href=""><img src="{{city?.imageUrl}}" alt="" class="img-fluid rounded-square w-100"></a>
            </div>
            <div class="col-6 card-title align-self-center mb-0">
-              <h5></h5>
-              <p class="m-0"></p>
+              <h5>{{city?.name}}</h5>
+              <p class="m-0">{{city?.country}}</p>
            </div>
         </div>
         <ul class="list-group list-group-flush">
-           <li class="list-group-item"><i class="fa fa-calendar float-right"></i></li>
-           <li class="list-group-item"><i class="fa fa-star float-right"></i></li>
-           <li class="list-group-item"><i class="fa fa-comment float-right"></i></li>
+           <li class="list-group-item">Year: {{city?.visitedYear}}<i class="fa fa-calendar float-right"></i></li>
+           <li class="list-group-item">Rating: {{city?.rating}}/5<i class="fa fa-star float-right"></i></li>
+           <li class="list-group-item">Review: {{city?.review}}<i class="fa fa-comment float-right"></i></li>
         </ul>
         <div class="card-body">
            <div class="float-right btn-group btn-group-sm">
