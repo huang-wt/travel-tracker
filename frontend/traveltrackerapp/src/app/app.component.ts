@@ -72,6 +72,22 @@ export class AppComponent implements OnInit {
     );
   }
 
+  public searchCities(key: string): void {
+    const results: City[] = [];
+    for (const city of this.cities) {
+      if (city.name.toLowerCase().indexOf(key.toLowerCase()) !== -1
+      || city.visitedYear.toLowerCase().indexOf(key.toLowerCase()) !== -1
+      || city.review.toLowerCase().indexOf(key.toLowerCase()) !== -1) {
+        results.push(city);
+      }
+    }
+
+    this.cities = results;
+    if (results.length === 0 || !key) {
+      this.getCities();
+    }
+  }
+
   public onOpenModal(city: City | null, mode: string): void {
     const container = document.getElementById('main-container');
     const button = document.createElement('button');
