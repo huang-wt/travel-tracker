@@ -76,6 +76,7 @@ export class AppComponent implements OnInit {
     const results: City[] = [];
     for (const city of this.cities) {
       if (city.name.toLowerCase().indexOf(key.toLowerCase()) !== -1
+      || city.country.toLowerCase().indexOf(key.toLowerCase()) !== -1
       || city.visitedYear.toLowerCase().indexOf(key.toLowerCase()) !== -1
       || city.review.toLowerCase().indexOf(key.toLowerCase()) !== -1) {
         results.push(city);
