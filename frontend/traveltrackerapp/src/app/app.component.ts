@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { City } from './city';
 import { CityService } from './city.service';
+import { GeocodingService } from './geocoding.service';
 
 @Component({
   selector: 'app-root',
@@ -12,20 +13,44 @@ import { CityService } from './city.service';
 export class AppComponent implements OnInit {
   title = 'traveltrackerapp';
 
+  public zoom: number = 2;
+  public markers: any[] = [];
+
   public cities: City[] = [];
   public editCity: City | null = null;
   public deleteCity: City | null = null;
 
-  constructor(private cityService: CityService){}
+  constructor(private cityService: CityService,
+              private geocodingService: GeocodingService){}
 
   ngOnInit(): void {
-    this.getCities();
+    this.loadCitiesAndMarkers();
   }
 
-  public getCities(): void {
+  public loadCitiesAndMarkers(): void {
     this.cityService.getCities().subscribe(
       (response: City[]) => {
         this.cities = response;
+        for (var city of this.cities) {
+          this.geocodingService.getCityData(city.name, city.country).subscribe(
+            (data: any) => {
+              var latVal: number = data?.results[0].geometry?.location?.lat;
+              var lngVal: number = data?.results[0].geometry?.location?.lng;
+              this.markers.push(
+                {
+                  position: {
+                    lat: latVal,
+                    lng: lngVal
+                  },
+                  title: city.name
+                }
+              )
+            },
+            (error: HttpErrorResponse) => {
+              alert(error.message);
+            }
+          );
+        }
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -38,7 +63,7 @@ export class AppComponent implements OnInit {
     this.cityService.addCity(addForm.value).subscribe(
       (response: City) => {
         console.log(response);
-        this.getCities();
+        this.loadCitiesAndMarkers();
         addForm.reset();
       },
       (error: HttpErrorResponse) => {
@@ -52,7 +77,7 @@ export class AppComponent implements OnInit {
     this.cityService.updateCity(city).subscribe(
       (response: City) => {
         console.log(response);
-        this.getCities();
+        this.loadCitiesAndMarkers();
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -64,7 +89,7 @@ export class AppComponent implements OnInit {
     this.cityService.deleteCity(cityId).subscribe(
       (response: void) => {
         console.log(response);
-        this.getCities();
+        this.loadCitiesAndMarkers();
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -85,7 +110,7 @@ export class AppComponent implements OnInit {
 
     this.cities = results;
     if (results.length === 0 || !key) {
-      this.getCities();
+      this.loadCitiesAndMarkers();
     }
   }
 

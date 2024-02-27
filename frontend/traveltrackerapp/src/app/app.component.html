@@ -16,6 +16,11 @@
   </div>
 </nav>
 <div class="container" id="main-container">
+<div>
+  <google-map height="500px" width="100%" [zoom]="zoom">
+    <map-marker *ngFor="let marker of markers" [position]="marker?.position"></map-marker>
+  </google-map>
+</div>
 <div class="row">
   <div *ngFor="let city of cities" class="col-md-6 col-xl-4">
      <div class="card m-b-30">
