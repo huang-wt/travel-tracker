@@ -6,4 +6,5 @@ export interface City {
   rating: number;
   review: string;
   imageUrl: string;
+  position: any;
 }

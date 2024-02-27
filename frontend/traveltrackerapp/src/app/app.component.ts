@@ -14,7 +14,6 @@ export class AppComponent implements OnInit {
   title = 'traveltrackerapp';
 
   public zoom: number = 2;
-  public markers: any[] = [];
 
   public cities: City[] = [];
   public editCity: City | null = null;
@@ -31,26 +30,24 @@ export class AppComponent implements OnInit {
     this.cityService.getCities().subscribe(
       (response: City[]) => {
         this.cities = response;
-        for (var city of this.cities) {
+        this.cities.forEach((city, index) => {
           this.geocodingService.getCityData(city.name, city.country).subscribe(
             (data: any) => {
               var latVal: number = data?.results[0].geometry?.location?.lat;
               var lngVal: number = data?.results[0].geometry?.location?.lng;
-              this.markers.push(
-                {
-                  position: {
-                    lat: latVal,
-                    lng: lngVal
-                  },
-                  title: city.name
+              this.cities[index] = {
+                ...city,
+                position: {
+                  lat: latVal,
+                  lng: lngVal
                 }
-              )
+              }
             },
             (error: HttpErrorResponse) => {
               alert(error.message);
             }
           );
-        }
+        });
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
