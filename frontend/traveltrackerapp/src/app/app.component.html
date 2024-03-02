@@ -9,15 +9,21 @@
            <a class="nav-link" (click)="onOpenModal(null, 'add')">Add City <span class="sr-only">(current)</span></a>
         </li>
      </ul>
-     <form class="form-inline my-2 my-lg-0">
-        <input type="search" (ngModelChange)="searchCities(key.value)" #key="ngModel" ngModel
-         name="key" id="searchName" class="form-control mr-sm-2" placeholder="Search cities..." required>
-     </form>
+     <div class="form-inline">
+      <select class="custom-select mr-2" [(ngModel)]="selectCountry" (ngModelChange)="onSelectCountry(selectCountry)">
+        <option selected value="World">World</option>
+        <option *ngFor="let country of countries" [value]="country">{{country}}</option>
+      </select>
+      <form class="form-inline my-2 my-lg-0">
+          <input type="search" (ngModelChange)="searchCities(key.value)" #key="ngModel" ngModel
+          name="key" id="searchName" class="form-control mr-sm-2" placeholder="Search cities..." required>
+      </form>
+     </div>
   </div>
 </nav>
 <div class="container" id="main-container">
 <div>
-  <google-map height="500px" width="100%" [zoom]="zoom">
+  <google-map height="500px" width="100%" [zoom]="zoom" [center]="center">
     <map-marker *ngFor="let city of cities" [position]="city?.position"></map-marker>
   </google-map>
 </div>

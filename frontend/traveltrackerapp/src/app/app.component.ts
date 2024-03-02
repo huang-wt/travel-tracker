@@ -4,6 +4,7 @@ import { NgForm } from '@angular/forms';
 import { City } from './city';
 import { CityService } from './city.service';
 import { GeocodingService } from './geocoding.service';
+import { WORLD_MAP, COUNTRIES } from './country';
 
 @Component({
   selector: 'app-root',
@@ -13,9 +14,12 @@ import { GeocodingService } from './geocoding.service';
 export class AppComponent implements OnInit {
   title = 'traveltrackerapp';
 
-  public zoom: number = 2;
+  public zoom: number = WORLD_MAP.zoom;
+  public center = WORLD_MAP.center;
+  public selectCountry: string = WORLD_MAP.name;
 
   public cities: City[] = [];
+  public countries: string[] = [];
   public editCity: City | null = null;
   public deleteCity: City | null = null;
 
@@ -51,6 +55,15 @@ export class AppComponent implements OnInit {
             }
           );
         });
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+
+    this.cityService.getCountries().subscribe(
+      (response: string[]) => {
+        this.countries = response;
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -133,6 +146,17 @@ export class AppComponent implements OnInit {
 
     container?.appendChild(button);
     button.click();
+  }
+
+  public onSelectCountry(country: string) {
+    const countryKey = country.toLowerCase().replace(' ', '');
+    this.zoom = COUNTRIES[countryKey as keyof typeof COUNTRIES].zoom;
+    this.center = COUNTRIES[countryKey as keyof typeof COUNTRIES].center;
+    if (country === WORLD_MAP.name) {
+      this.loadCitiesAndMarkers();
+    } else {
+      this.cities = this.cities.filter(city => city.country === country);
+    }
   }
 
 }
