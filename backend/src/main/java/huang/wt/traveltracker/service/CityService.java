@@ -28,6 +28,10 @@ public class CityService {
         return cityRepo.findAll();
     }
     
+    public List<String> findDistinctCountries() {
+        return cityRepo.findDistinctCountries();
+    }
+    
     public City updateCity(City city) {
         return cityRepo.save(city);
     }

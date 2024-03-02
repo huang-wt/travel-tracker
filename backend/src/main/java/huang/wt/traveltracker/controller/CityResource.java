@@ -31,6 +31,12 @@ public class CityResource {
         return new ResponseEntity<>(city, HttpStatus.OK);
     }
 
+    @GetMapping("/country")
+    public ResponseEntity<List<String>> getDistinctCountries() {
+        List<String> countries = cityService.findDistinctCountries();
+        return new ResponseEntity<>(countries, HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<City> addCity(@RequestBody City city) {
         City newCity = cityService.addCity(city);

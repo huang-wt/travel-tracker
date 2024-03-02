@@ -16,6 +16,10 @@ export class CityService {
     return this.http.get<City[]>(`${this.apiServerUrl}/city/all`);
   }
 
+  public getCountries(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiServerUrl}/city/country`);
+  }
+
   public addCity(city: City): Observable<City> {
     return this.http.post<City>(`${this.apiServerUrl}/city/add`, city);
   }
