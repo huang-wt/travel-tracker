@@ -27,33 +27,20 @@ export class AppComponent implements OnInit {
               private geocodingService: GeocodingService){}
 
   ngOnInit(): void {
-    this.loadCitiesAndMarkers();
+    this.load();
   }
 
-  public loadCitiesAndMarkers(): void {
+  public load(): void {
+    this.loadCities();
+    this.loadCountries();
+  }
+
+  private loadCities(): void {
     this.cityService.getCities().subscribe(
       (response: City[]) => {
         this.cities = response;
         this.cities.forEach((city, index) => {
-          // this.geocodingService.getCityData(city.name, city.country).subscribe(
-          this.geocodingService.getCityDataFromLocal(city.name).subscribe(
-            (data: any) => {
-              // var latVal: number = data?.results[0].geometry?.location?.lat;
-              // var lngVal: number = data?.results[0].geometry?.location?.lng;
-              var latVal: number = data?.position?.lat;
-              var lngVal: number = data?.position?.lng;
-              this.cities[index] = {
-                ...city,
-                position: {
-                  lat: latVal,
-                  lng: lngVal
-                }
-              }
-            },
-            (error: HttpErrorResponse) => {
-              alert(error.message);
-            }
-          );
+          this.addMarker(city, index);
         });
       },
       (error: HttpErrorResponse) => {
@@ -61,6 +48,32 @@ export class AppComponent implements OnInit {
       }
     );
 
+    this.loadCountries();
+  }
+
+  private addMarker(city: City, index: number): void {
+    // this.geocodingService.getCityData(city.name, city.country).subscribe(
+    this.geocodingService.getCityDataFromLocal(city.name).subscribe(
+      (data: any) => {
+        // var latVal: number = data?.results[0].geometry?.location?.lat;
+        // var lngVal: number = data?.results[0].geometry?.location?.lng;
+        var latVal: number = data?.position?.lat;
+        var lngVal: number = data?.position?.lng;
+        this.cities[index] = {
+          ...city,
+          position: {
+            lat: latVal,
+            lng: lngVal
+          }
+        }
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
+  private loadCountries(): void {
     this.cityService.getCountries().subscribe(
       (response: string[]) => {
         this.countries = response;
@@ -76,7 +89,7 @@ export class AppComponent implements OnInit {
     this.cityService.addCity(addForm.value).subscribe(
       (response: City) => {
         console.log(response);
-        this.loadCitiesAndMarkers();
+        this.load();
         addForm.reset();
       },
       (error: HttpErrorResponse) => {
@@ -90,7 +103,7 @@ export class AppComponent implements OnInit {
     this.cityService.updateCity(city).subscribe(
       (response: City) => {
         console.log(response);
-        this.loadCitiesAndMarkers();
+        this.load();
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -102,7 +115,7 @@ export class AppComponent implements OnInit {
     this.cityService.deleteCity(cityId).subscribe(
       (response: void) => {
         console.log(response);
-        this.loadCitiesAndMarkers();
+        this.load();
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
@@ -123,7 +136,7 @@ export class AppComponent implements OnInit {
 
     this.cities = results;
     if (results.length === 0 || !key) {
-      this.loadCitiesAndMarkers();
+      this.load();
     }
   }
 
@@ -153,7 +166,7 @@ export class AppComponent implements OnInit {
     this.zoom = COUNTRIES[countryKey as keyof typeof COUNTRIES].zoom;
     this.center = COUNTRIES[countryKey as keyof typeof COUNTRIES].center;
     if (country === WORLD_MAP.name) {
-      this.loadCitiesAndMarkers();
+      this.load();
     } else {
       this.cities = this.cities.filter(city => city.country === country);
     }
