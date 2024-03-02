@@ -31,10 +31,13 @@ export class AppComponent implements OnInit {
       (response: City[]) => {
         this.cities = response;
         this.cities.forEach((city, index) => {
-          this.geocodingService.getCityData(city.name, city.country).subscribe(
+          // this.geocodingService.getCityData(city.name, city.country).subscribe(
+          this.geocodingService.getCityDataFromLocal(city.name).subscribe(
             (data: any) => {
-              var latVal: number = data?.results[0].geometry?.location?.lat;
-              var lngVal: number = data?.results[0].geometry?.location?.lng;
+              // var latVal: number = data?.results[0].geometry?.location?.lat;
+              // var lngVal: number = data?.results[0].geometry?.location?.lng;
+              var latVal: number = data?.position?.lat;
+              var lngVal: number = data?.position?.lng;
               this.cities[index] = {
                 ...city,
                 position: {
