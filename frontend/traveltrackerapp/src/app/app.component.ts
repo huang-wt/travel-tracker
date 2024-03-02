@@ -5,6 +5,7 @@ import { City } from './city';
 import { CityService } from './city.service';
 import { GeocodingService } from './geocoding.service';
 import { WORLD_MAP, COUNTRIES } from './country';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -18,8 +19,8 @@ export class AppComponent implements OnInit {
   public center = WORLD_MAP.center;
   public selectCountry: string = WORLD_MAP.name;
 
-  public cities: City[] = [];
-  public countries: string[] = [];
+  public cities$: Observable<City[]> | undefined = undefined;
+  public countries$: Observable<string[]> | undefined = undefined;
   public editCity: City | null = null;
   public deleteCity: City | null = null;
 
@@ -31,56 +32,35 @@ export class AppComponent implements OnInit {
   }
 
   public load(): void {
-    this.loadCities();
-    this.loadCountries();
+    this.cities$ = this.loadCities();
+    this.countries$ = this.cityService.getCountries();
   }
 
-  private loadCities(): void {
-    this.cityService.getCities().subscribe(
-      (response: City[]) => {
-        this.cities = response;
-        this.cities.forEach((city, index) => {
-          this.addMarker(city, index);
-        });
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
-
-    this.loadCountries();
-  }
-
-  private addMarker(city: City, index: number): void {
-    // this.geocodingService.getCityData(city.name, city.country).subscribe(
-    this.geocodingService.getCityDataFromLocal(city.name).subscribe(
-      (data: any) => {
-        // var latVal: number = data?.results[0].geometry?.location?.lat;
-        // var lngVal: number = data?.results[0].geometry?.location?.lng;
-        var latVal: number = data?.position?.lat;
-        var lngVal: number = data?.position?.lng;
-        this.cities[index] = {
-          ...city,
-          position: {
-            lat: latVal,
-            lng: lngVal
+  private loadCities(): Observable<City[]> {
+    return this.cityService.getCities().pipe(
+      map((cities: City[]) => {
+        cities.forEach((city, index) => {
+          cities[index] = {
+            ...city,
+            position$: this.getMarker(city.name)
           }
-        }
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
+        });
+        return cities;
+      })
     );
   }
 
-  private loadCountries(): void {
-    this.cityService.getCountries().subscribe(
-      (response: string[]) => {
-        this.countries = response;
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
+  private getMarker(city: string): Observable<any> {
+    // return this.geocodingService.getCityData(city.name, city.country).subscribe(
+    return this.geocodingService.getCityDataFromLocal(city).pipe(
+      map(data => {
+        return {
+          // lat: Number(data?.results[0].geometry?.location?.lat),
+          // lng: Number(data?.results[0].geometry?.location?.lng)
+          lat: Number(data?.position?.lat),
+          lng: Number(data?.position?.lng)
+        }
+      })
     );
   }
 
@@ -124,18 +104,17 @@ export class AppComponent implements OnInit {
   }
 
   public searchCities(key: string): void {
-    const results: City[] = [];
-    for (const city of this.cities) {
-      if (city.name.toLowerCase().indexOf(key.toLowerCase()) !== -1
-      || city.country.toLowerCase().indexOf(key.toLowerCase()) !== -1
-      || city.visitedYear.toLowerCase().indexOf(key.toLowerCase()) !== -1
-      || city.review.toLowerCase().indexOf(key.toLowerCase()) !== -1) {
-        results.push(city);
-      }
-    }
+    this.cities$ = this.cities$?.pipe(
+      map((cities: City[]) => {
+        return cities.filter(city => 
+          city.name.toLowerCase().indexOf(key.toLowerCase()) !== -1
+          || city.country.toLowerCase().indexOf(key.toLowerCase()) !== -1
+          || city.visitedYear.toLowerCase().indexOf(key.toLowerCase()) !== -1
+          || city.review.toLowerCase().indexOf(key.toLowerCase()) !== -1);
+      })
+    );
 
-    this.cities = results;
-    if (results.length === 0 || !key) {
+    if (!key) {
       this.load();
     }
   }
@@ -168,7 +147,11 @@ export class AppComponent implements OnInit {
     if (country === WORLD_MAP.name) {
       this.load();
     } else {
-      this.cities = this.cities.filter(city => city.country === country);
+      this.cities$ = this.cities$?.pipe(
+        map((cities: City[]) => {
+          return cities.filter(city => city.country === country);
+        })
+      );
     }
   }
 

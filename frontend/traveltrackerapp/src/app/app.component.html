@@ -12,7 +12,7 @@
      <div class="form-inline">
       <select class="custom-select mr-2" [(ngModel)]="selectCountry" (ngModelChange)="onSelectCountry(selectCountry)">
         <option selected value="World">World</option>
-        <option *ngFor="let country of countries" [value]="country">{{country}}</option>
+        <option *ngFor="let country of countries$ | async" [value]="country">{{country}}</option>
       </select>
       <form class="form-inline my-2 my-lg-0">
           <input type="search" (ngModelChange)="searchCities(key.value)" #key="ngModel" ngModel
@@ -24,11 +24,11 @@
 <div class="container" id="main-container">
 <div>
   <google-map height="500px" width="100%" [zoom]="zoom" [center]="center">
-    <map-marker *ngFor="let city of cities" [position]="city?.position"></map-marker>
+    <map-marker *ngFor="let city of cities$ | async" [position]="city?.position$ | async"></map-marker>
   </google-map>
 </div>
 <div class="row">
-  <div *ngFor="let city of cities" class="col-md-6 col-xl-4">
+  <div *ngFor="let city of cities$ | async" class="col-md-6 col-xl-4">
      <div class="card m-b-30">
         <div class="card-body row">
            <div class="col-6">
@@ -170,7 +170,7 @@
 </div>
 
 <!-- Notification for no cities -->
-<div *ngIf="cities?.length == 0" class="col-lg-12 col-md-12 col-xl-12">
+<div *ngIf="(cities$ | async)?.length == 0" class="col-lg-12 col-md-12 col-xl-12">
 <div class="alert alert-info" role="alert">
   <h4 class="alert-heading">NO CITIES!</h4>
   <p>No Cities were found.</p>

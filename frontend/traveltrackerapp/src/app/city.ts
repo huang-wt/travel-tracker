@@ -1,3 +1,5 @@
+import { Observable } from "rxjs";
+
 export interface City {
   id: number;
   name: string;
@@ -6,5 +8,5 @@ export interface City {
   rating: number;
   review: string;
   imageUrl: string;
-  position: any;
+  position$: Observable<any> | undefined;
 }
