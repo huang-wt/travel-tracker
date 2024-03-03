@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   public selectCountry: string = WORLD_MAP.name;
 
   public cities$: Observable<City[]> | undefined = undefined;
+  public displayCities$: Observable<City[]> | undefined = undefined;
   public countries$: Observable<string[]> | undefined = undefined;
   public editCity: City | null = null;
   public deleteCity: City | null = null;
@@ -33,7 +34,15 @@ export class AppComponent implements OnInit {
 
   public load(): void {
     this.cities$ = this.loadCities();
+    this.displayCities$ = this.cities$;
     this.countries$ = this.cityService.getCountries();
+    this.initMap();
+  }
+
+  private initMap(): void {
+    this.zoom = WORLD_MAP.zoom;
+    this.center = WORLD_MAP.center;
+    this.selectCountry = WORLD_MAP.name;
   }
 
   private loadCities(): Observable<City[]> {
@@ -104,7 +113,7 @@ export class AppComponent implements OnInit {
   }
 
   public searchCities(key: string): void {
-    this.cities$ = this.cities$?.pipe(
+    this.displayCities$ = this.displayCities$?.pipe(
       map((cities: City[]) => {
         return cities.filter(city => 
           city.name.toLowerCase().indexOf(key.toLowerCase()) !== -1
@@ -116,6 +125,7 @@ export class AppComponent implements OnInit {
 
     if (!key) {
       this.load();
+      this.displayCities$ = this.cities$;
     }
   }
 
@@ -147,7 +157,7 @@ export class AppComponent implements OnInit {
     if (country === WORLD_MAP.name) {
       this.load();
     } else {
-      this.cities$ = this.cities$?.pipe(
+      this.displayCities$ = this.cities$?.pipe(
         map((cities: City[]) => {
           return cities.filter(city => city.country === country);
         })
